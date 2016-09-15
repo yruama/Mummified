@@ -11,8 +11,10 @@ public class Player : MonoBehaviour
     float jumpVelocity = 8;
     public float speed = 5;
     public float JumpHeight = 3;
-    public float timeToJumpApex = .4f;
+    public float forceFirstJump = .4f;
+    public float forceSecondJump = 0.3f;
     int nbJump = 0;
+    float _timeJump;
     float accelerationTimeAirborne = .2f;
     float accelerationTimeGrounded = .1f;
     float velocityXSmoothing;
@@ -36,11 +38,13 @@ public class Player : MonoBehaviour
 
 	void Start ()
     {
+        _timeJump = Time.time;
         _isAttacking = false;
         _canAttack = true;
         controller = GetComponent<Controller2D>();
-        gravity = -(2 * JumpHeight) / Mathf.Pow(timeToJumpApex, 2);
-        jumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
+        gravity = -(2 * JumpHeight) / Mathf.Pow(forceFirstJump, 2);
+        jumpVelocity = Mathf.Abs(gravity) * forceFirstJump;
+        forceSecondJump = Mathf.Abs(gravity) * forceSecondJump;
     }
 
     void Update()
@@ -79,7 +83,15 @@ public class Player : MonoBehaviour
 
         if (Input.GetButtonDown("Jump_" + playerId) && nbJump < 2)
         {
-            velocity.y = jumpVelocity;
+            if (nbJump == 0)
+            {
+                velocity.y = jumpVelocity; Debug.Log("1");
+            }
+            else
+            {
+                velocity.y = forceSecondJump; Debug.Log("2");
+            }
+                
             nbJump += 1;
         }
 

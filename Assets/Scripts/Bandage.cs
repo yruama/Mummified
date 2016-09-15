@@ -42,7 +42,6 @@ public class Bandage : MonoBehaviour
 
         if (_state == 0)
         {
-            Debug.Log(_velocity);
             _velocity.x = Mathf.SmoothDamp(_velocity.x, _velocity.x, ref velocityXSmoothing, (_c.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
             if (Time.time - _time > timeToUseGravity)
                 _velocity.y += _gravity * Time.deltaTime;
