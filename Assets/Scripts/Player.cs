@@ -132,7 +132,7 @@ public class Player : MonoBehaviour
     void Attack()
     {
         GameObject g = Instantiate(projectile, pos[posIndex].position, Quaternion.identity) as GameObject;
-        g.transform.eulerAngles = pos[posIndex].eulerAngles;
+        g.GetComponent<Bandage>().direction = pos[posIndex].eulerAngles;
         SetHealth(-15);
     }
 }
