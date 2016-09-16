@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{630CB6AF-464B-C343-5FB0-DF1FA22D8E8D}") = "HUD-Mummified", "Assembly-CSharp.csproj", "{39AAF232-7BFB-4F2C-1836-9E9519E157EB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{39AAF232-7BFB-4F2C-1836-9E9519E157EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39AAF232-7BFB-4F2C-1836-9E9519E157EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39AAF232-7BFB-4F2C-1836-9E9519E157EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39AAF232-7BFB-4F2C-1836-9E9519E157EB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
