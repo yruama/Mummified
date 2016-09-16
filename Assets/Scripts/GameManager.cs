@@ -1,52 +1,46 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum menuState
-{
-    MENU,
-    OPTIONS,
-    QUITTER,
-    PERSONNAGE,
-    GAME
-};
-
 public class GameManager : MonoBehaviour
 {
     [Header("Position")]
     public Transform[] startPlayerPosition;
     public Transform[] utilityPosition;
 
-    [Header("Other")]
-    private menuState ms;
-    public int i;
-
     [Header("Menus")]
     public GameObject menu;
     public Transform[] positionMenu;
     public float speedMenu;
     private int _indexMenu;
+    private int _lastIndexMenu;
+    private Vector2[] _targetPostion = new Vector2[2];
     private bool _changeMenu;
          
 	void Start ()
     {
-        ms = menuState.MENU;
+        _lastIndexMenu = 0;
         _changeMenu = false;
 	}
 	
 	void Update ()
     {
-	    if (_changeMenu == true)
+
+        GetNumberOfJoysticks();
+
+
+        if (_changeMenu == true)
         {
-            menu.transform.position = Vector3.MoveTowards(menu.transform.position, positionMenu[_indexMenu].position, speedMenu * Time.deltaTime);
+            positionMenu[_indexMenu].position = Vector3.MoveTowards(positionMenu[_indexMenu].position, _targetPostion[0], speedMenu * Time.deltaTime);
+            positionMenu[_lastIndexMenu].position = Vector3.MoveTowards(positionMenu[_lastIndexMenu].position, _targetPostion[1], speedMenu * Time.deltaTime);
         }
-        if (menu.transform.position == positionMenu[_indexMenu].position)
+        if (menu.transform.position == positionMenu[_indexMenu].position && _changeMenu == true)
         {
-            _changeMenu = false;
+            positionMenu[_lastIndexMenu].position = positionMenu[4].position;
         }
 
-        if (Input.GetButtonDown("Back_1"))
+        if (Input.GetButtonDown("Back"))
         {
-
+            InputBack();
         }
 	}
 
@@ -54,6 +48,37 @@ public class GameManager : MonoBehaviour
     public void SetMenu(int i)
     {
         _indexMenu = i;
+        _targetPostion[0] = positionMenu[_lastIndexMenu].position;
+        _targetPostion[1] = positionMenu[3].position;
         _changeMenu = true;
+    }
+
+    public void Quitter()
+    {
+
+    }
+
+    void InputBack()
+    {
+        if (_indexMenu == 4)
+            SetMenu(3);
+        else
+            SetMenu(0);
+    }
+
+    void GetNumberOfJoysticks()
+    {
+        int i = 0;
+        int j = 0;
+
+        while (Input.GetJoystickNames().Length > i)
+        {
+            if (Input.GetJoystickNames()[i].Length > 0)
+            {
+                j++;
+            }
+            i = i + 1;
+        }
+        Debug.Log(j);
     }
 }
