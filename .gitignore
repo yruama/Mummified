@@ -1,0 +1,30 @@
+### Unity directories
+temp
+obj
+library
+
+### Custom directories
+screenshots
+builds/
+
+### Personal directories
+Hydraria*
+
+
+### Visual Studio / MonoDev / Emacs
+.vs
+*.pidb*
+*.userprefs*
+*.user*
+*.csproj*
+*.unityproj*
+*.sln*
+*.suo*
+*~
+
+### OS
+.DS_Store*
+.DS_Store?
+._*
+.Trashes*
+Thumbs.db*
