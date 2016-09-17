@@ -44,7 +44,7 @@ public class Player : MonoBehaviour
         controller = GetComponent<Controller2D>();
         gravity = -(2 * JumpHeight) / Mathf.Pow(forceFirstJump, 2);
         jumpVelocity = Mathf.Abs(gravity) * forceFirstJump;
-        forceSecondJump = Mathf.Abs(gravity) * forceSecondJump;
+        //forceSecondJump = Mathf.Abs(gravity) * forceSecondJump;
     }
 
     void Update()
