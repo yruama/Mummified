@@ -1,11 +1,25 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 [RequireComponent (typeof (Controller2D))]
 public class Player : MonoBehaviour
 {
+    /* *** State *** */
+    private int _state; //0 = menu 1 = jeu // 2 = afk
+
+    /* *** Menu *** */
+    public GameObject myColor;
+    public Color c;
+    private Color _saveColor;
+    public int indexColor;
+    public float timeColor;
+    private float _timeColor;
+    private bool _validate;
+
     /* *** Infos *** */
     public int playerId;
+    public GameManager gm;
 
     /* *** Jump & Deplacement *** */
     float jumpVelocity = 8;
@@ -38,6 +52,11 @@ public class Player : MonoBehaviour
 
 	void Start ()
     {
+        _validate = false;
+        _timeColor = Time.time;
+        indexColor = playerId - 1;
+        c = gm.colors[indexColor];
+        _state = 2;
         _timeJump = Time.time;
         _isAttacking = false;
         _canAttack = true;
@@ -49,6 +68,24 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        if (_state == 2)
+        {
+            c = Color.grey;
+            myColor.GetComponent<Image>().color = c;
+            return;
+        }
+        if (_state == 0)
+        {
+            if (!_validate)
+                c = gm.colors[indexColor];
+            else
+                c = _saveColor;
+            myColor.GetComponent<Image>().color = c;
+            return;
+        }
+            
+
+
         Vector2 input;
         if (Input.GetButton("Attack_" + playerId) && health > 15 && _canAttack)
         {
@@ -67,7 +104,42 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal_" + playerId), Input.GetAxisRaw("Vertical_" + playerId));
+        if (_state == 2)
+            return;
+
+            Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal_" + playerId), Input.GetAxisRaw("Vertical_" + playerId));
+
+        if (_state == 0)
+        {
+            if (input.x > 0 && Time.time - _timeColor > timeColor)
+            {
+                _timeColor = Time.time;
+                indexColor += 1;
+                if (indexColor > gm.colors.Count - 1)
+                    indexColor = 0;
+            }
+            else if (input.x < 0 && Time.time - _timeColor > timeColor)
+            {
+                _timeColor = Time.time;
+                indexColor -= 1;
+                if (indexColor < 0)
+                    indexColor = gm.colors.Count - 1;
+            }
+
+            if (_validate == false && Input.GetButtonDown("Jump_" + playerId))
+            {
+                _saveColor = c;
+                gm.colors.Remove(c);
+                _validate = true;
+            }
+            else if (_validate == true && Input.GetButtonDown("Attack_" + playerId))
+            {
+                gm.colors.Add(_saveColor);
+                _validate = false;
+            }
+            return;
+        }
+
 
         if (controller.collisions.above || controller.collisions.below)
         {
@@ -146,5 +218,10 @@ public class Player : MonoBehaviour
         GameObject g = Instantiate(projectile, pos[posIndex].position, Quaternion.identity) as GameObject;
         g.GetComponent<Bandage>().direction = pos[posIndex].eulerAngles;
         SetHealth(-15);
+    }
+
+    public void SetState(int i)
+    {
+        _state = i;
     }
 }

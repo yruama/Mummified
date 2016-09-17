@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,6 +16,14 @@ public class GameManager : MonoBehaviour
     private int _lastIndexMenu;
     private Vector2[] _targetPostion = new Vector2[2];
     private bool _changeMenu;
+
+    [Header("Color")]
+    public List<Color> colors;
+
+    [Header("Player")]
+    public GameObject Players;
+    private int _nbPlayer;
+    private int _lastNbPlayer;
          
 	void Start ()
     {
@@ -24,8 +33,17 @@ public class GameManager : MonoBehaviour
 	
 	void Update ()
     {
-
         GetNumberOfJoysticks();
+        Debug.Log("NBPLAYER : " + _nbPlayer + "LastNBPLAYER : " + _lastNbPlayer);
+        if (_nbPlayer != _lastNbPlayer)
+        {
+            _lastNbPlayer = _nbPlayer;
+            SetPlayer();
+        }
+           
+
+        
+
 
 
         if (_changeMenu == true)
@@ -79,6 +97,24 @@ public class GameManager : MonoBehaviour
             }
             i = i + 1;
         }
-        Debug.Log(j);
+        _nbPlayer = j;
+
+
+    }
+
+    void SetPlayer()
+    {
+        foreach (Transform child in Players.transform)
+        {
+            child.gameObject.GetComponent<Player>().SetState(2);
+        }
+
+        int i = 0;
+
+        while (i < _nbPlayer)
+        {
+            Players.transform.GetChild(i).GetComponent<Player>().SetState(0);
+            i = i + 1;
+        }
     }
 }
