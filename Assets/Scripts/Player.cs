@@ -36,6 +36,10 @@ public class Player : MonoBehaviour
     /* *** Point de vie *** */
     public int health = 100;
 
+    /* *** Sounds *** */
+    private AudioSource source;
+    public AudioClip Jump;
+
 	void Start ()
     {
         _timeJump = Time.time;
@@ -45,6 +49,8 @@ public class Player : MonoBehaviour
         gravity = -(2 * JumpHeight) / Mathf.Pow(forceFirstJump, 2);
         jumpVelocity = Mathf.Abs(gravity) * forceFirstJump;
         //forceSecondJump = Mathf.Abs(gravity) * forceSecondJump;
+
+        source = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -85,10 +91,14 @@ public class Player : MonoBehaviour
         {
             if (nbJump == 0)
             {
+                            source.PlayOneShot(Jump,1);
+
                 velocity.y = jumpVelocity; Debug.Log("1");
+
             }
             else
             {
+                
                 velocity.y = forceSecondJump; Debug.Log("2");
             }
                 
