@@ -41,6 +41,7 @@ public class PlayerControllerGame : MonoBehaviour
     public GameManagerGame gmg;
     private Color _color;
     public TextMesh t;
+    private Animator _anim;
 
     void Start ()
     {
@@ -50,6 +51,7 @@ public class PlayerControllerGame : MonoBehaviour
         jumpVelocity = Mathf.Abs(gravity) * forceFirstJump;
         transform.position = spawnData.map1[playerId - 1];
 
+        _anim = GetComponent<Animator>();
         _canAttack = true;
 
         _color = GetComponent<PlayerControllerMenu>().GetColor();
@@ -76,6 +78,7 @@ public class PlayerControllerGame : MonoBehaviour
         Vector2 input;
         if (Input.GetButton("Attack_" + playerId) && health > 15 && _canAttack)
         {
+            _anim.SetBool("prepareAttack", true);
             _isAttacking = true;
             input = new Vector2(Input.GetAxis("Horizontal_" + playerId), Input.GetAxis("Vertical_" + playerId));
             SetArrowPosition((int)(Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg));
@@ -83,6 +86,8 @@ public class PlayerControllerGame : MonoBehaviour
 
         if (Input.GetButtonUp("Attack_" + playerId) && health > 15 && _isAttacking == true)
         {
+            _anim.SetTrigger("ajustAttack");
+            _anim.SetBool("prepareAttack", false);
             Attack();
             ResetAttack();
             _canAttack = true;
@@ -119,6 +124,15 @@ public class PlayerControllerGame : MonoBehaviour
                 _canDoubleJump = false;
                 _canJump = false;
             }
+        }
+
+        if (Mathf.Abs(input.x) > 0)
+        {
+            _anim.SetBool("walk", true);
+        }
+        else
+        {
+            _anim.SetBool("walk", false);
         }
 
         float targetVelocityX = input.x * speed;
@@ -182,8 +196,9 @@ public class PlayerControllerGame : MonoBehaviour
         // g.transform.eulerAngles = pos[posIndex].eulerAngles;
         g.GetComponent<Bandage>().p = gameObject;
         g.GetComponent<Bandage>().enabled = true;
-        g.GetComponent<Bandage>().Reset();
         g.GetComponent<Bandage>().direction = pos[posIndex].eulerAngles;
+        g.GetComponent<Bandage>().Reset(0);
+        
         SetHealth(-15, 9);
     }
 }

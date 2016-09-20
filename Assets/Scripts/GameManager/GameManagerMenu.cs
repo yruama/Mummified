@@ -13,6 +13,7 @@ public class GameManagerMenu : MonoBehaviour
     private int _nbPlayer;
     private int _lastNbPlayer;
 
+
     [HideInInspector]
     public int[] availableColors;
 

@@ -31,9 +31,14 @@ public class Bandage : MonoBehaviour
 
     bool _test = true;
 
-    public void Reset()
+    public void Reset(int i)
     {
-        _state = 0;
+        _c.collisions.above = false;
+        _c.collisions.below = false;
+        _c.collisions.left = false;
+        _c.collisions.right = false;
+        _state = i;
+        _useGravity = true;
         GetComponent<SpriteRenderer>().sprite = s;
         _time = Time.time;
         _gravity = -9.81f;
@@ -42,19 +47,14 @@ public class Bandage : MonoBehaviour
 
     void Start()
     {
-        _state = 0;
-        _useGravity = true;
-        _time = Time.time;
         _c = GetComponent<Controller2D>();
-        _gravity = -9.81f;
-        _velocity = new Vector2(DegreeToVector2(direction.z).x, DegreeToVector2(direction.z).y) * startForce;
     }
 
     void Update()
     {
-        if (_c.collisions.above || _c.collisions.below || _c.collisions.left || _c.collisions.right)
+        if (_c.collisions.above || _c.collisions.below || _c.collisions.left || _c.collisions.right || _state == 1)
         {
-            _velocity.y = -9.81f;
+            _velocity.y = -15f;
             _velocity.x = 0;
             _useGravity = false;
         }
@@ -62,8 +62,11 @@ public class Bandage : MonoBehaviour
         if (_c.collisions.below)
         {
             _state = 1;
-            GetComponent<SpriteRenderer>().sprite = h;
+            
         }
+
+        if (_state == 1)
+            GetComponent<SpriteRenderer>().sprite = h;
 
         else if (_useGravity)
         {
@@ -72,6 +75,7 @@ public class Bandage : MonoBehaviour
                 _velocity.y += _gravity * Time.deltaTime;
             
         }
+       // Debug.Log(_velocity);
         _c.Move(_velocity * Time.deltaTime, Vector3.zero);
     }
 
@@ -94,6 +98,7 @@ public class Bandage : MonoBehaviour
                 coll.gameObject.GetComponent<PlayerControllerGame>().SetHealth(-25, playerId);
                 gmg.bandage.Add(gameObject);
                 transform.position = new Vector3(100, 100, 100);
+                GetComponent<Bandage>().enabled = false;
             }
         }
 
@@ -105,6 +110,7 @@ public class Bandage : MonoBehaviour
             transform.position = new Vector3(100, 100, 100);
             GetComponent<SpriteRenderer>().sprite = s;
             _state = 0;
+            GetComponent<Bandage>().enabled = false;
         }
     }
 }
