@@ -7,6 +7,8 @@ public class PlayerControllerMenu : MonoBehaviour
     [Header("BlocPersonnage")]
     public Sprite Disable;
     public GameObject Cadre;
+    public Sprite[] mummie;
+    public Image currentMummie;
     public Text state;
     public GameObject Mummy;
     public Color[] Color;
@@ -17,6 +19,8 @@ public class PlayerControllerMenu : MonoBehaviour
     public float timeToChangeColor;
     public GameManagerMenu gmm;
     public bool _available;
+
+    public Menu m;
 
     private Color _currentColor;
     private Color _saveColor;
@@ -33,11 +37,17 @@ public class PlayerControllerMenu : MonoBehaviour
 	
 	void Update ()
     {
+        if (m.currentMenu != 2)
+            return;
         if (!_available)
             return;
         if (!_validate)
         {
-            Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal_" + playerId), Input.GetAxisRaw("Vertical_" + playerId));
+            if (Input.GetButtonDown("Attack_1"))
+            {
+                m.SetMenu(1);
+            }
+                Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal_" + playerId), Input.GetAxisRaw("Vertical_" + playerId));
             if (input.x > 0 && Time.time - _timeColor > timeToChangeColor)
             {
                 _indexColor += 1;
@@ -59,12 +69,16 @@ public class PlayerControllerMenu : MonoBehaviour
 
             state.text = gmm.colorsName[_indexColor];
             state.color = gmm.colors[_indexColor];
+            currentMummie.GetComponent<RectTransform>().sizeDelta = new Vector2(189, 176);
+            currentMummie.sprite = mummie[0];
+            currentMummie.color = gmm.colors[_indexColor];
             Cadre.GetComponent<Image>().sprite = gmm.cadre[_indexColor];
 
             if (Input.GetButtonDown("Jump_" + playerId))
             {
                 _validate = true;
                 _saveColor = gmm.colors[_indexColor];
+                currentMummie.sprite = mummie[2];
                 state.text = "ready"; 
                 gmm.LockColor(_indexColor);
                 gmm.CheckValidate();
@@ -107,7 +121,10 @@ public class PlayerControllerMenu : MonoBehaviour
         {
             _available = false;
             Cadre.GetComponent<Image>().sprite = Disable;
-            state.text = "disconnect";
+            currentMummie.sprite = mummie[1];
+            currentMummie.color = new Color(255, 255, 255, 1);
+            currentMummie.GetComponent<RectTransform>().sizeDelta = new Vector2(97, 173);
+            state.text = "more than undead";
         }
         else
         {

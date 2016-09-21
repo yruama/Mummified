@@ -14,14 +14,21 @@ public class GameManagerGame : MonoBehaviour
     public int nbKill;
     private int _currentManche;
     private int _death;
+    public GameObject Players;
+    private bool _end;
 
     [Header("Event")]
     public Transform[] BandagePosition;
     public float timeBandageEvent;
     private float _timeBandage;
 
+    [Header("Timer")]
+    public float timeToDisplayScore;
+    private float _timeScore;
+
     void Start ()
     {
+        _end = false;
         foreach (Transform b in bandages)
             bandage.Add(b.gameObject);
 
@@ -30,10 +37,18 @@ public class GameManagerGame : MonoBehaviour
 	
 	void Update ()
     {
-	    if (Time.time - _timeBandage > timeBandageEvent)
+	    if (Time.time - _timeBandage > timeBandageEvent && _end == false)
         {
             _timeBandage = Time.time;
             SpawnBandage();
+        }
+
+        if (Time.time - _timeScore > timeToDisplayScore && _end == true)
+        {
+            Debug.Log("Afficher Score");
+            _end = false;
+            _timeBandage = Time.time;
+            Reset();
         }
 	}
 
@@ -43,7 +58,9 @@ public class GameManagerGame : MonoBehaviour
 
         if (_death + 1 == nbPlayer)
         {
+            _end = true;
             Debug.Log("FIN DE LA PARTIE");
+            _timeScore = Time.time;
         }
     }
 
@@ -65,5 +82,16 @@ public class GameManagerGame : MonoBehaviour
 
     }
 
+    void Reset()
+    {
+        foreach (Transform g in Players.transform)
+            g.GetComponent<PlayerControllerGame>().Reset();
 
+        bandage.Clear();
+        foreach (Transform b in bandages)
+        {
+            bandage.Add(b.gameObject);
+            b.position = new Vector3(100, 100, 100);
+        }
+    }
 }

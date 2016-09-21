@@ -75,7 +75,6 @@ public class Bandage : MonoBehaviour
                 _velocity.y += _gravity * Time.deltaTime;
             
         }
-       // Debug.Log(_velocity);
         _c.Move(_velocity * Time.deltaTime, Vector3.zero);
     }
 
@@ -112,5 +111,10 @@ public class Bandage : MonoBehaviour
             _state = 0;
             GetComponent<Bandage>().enabled = false;
         }
+    }
+
+    public void ResetPosition()
+    {
+        transform.position = new Vector3(100, 100, 100);
     }
 }

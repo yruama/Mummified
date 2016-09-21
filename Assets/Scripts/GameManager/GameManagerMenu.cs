@@ -10,8 +10,11 @@ public class GameManagerMenu : MonoBehaviour
     public GameObject[] players;
     public GameObject menu;
 
+    public GameObject Filtre;
+
     private int _nbPlayer;
     private int _lastNbPlayer;
+
 
 
     [HideInInspector]
@@ -57,6 +60,7 @@ public class GameManagerMenu : MonoBehaviour
         {
             Debug.Log("ON COMMENCE LA PARTIE");
             StartGame();
+            Filtre.SetActive(false);
         }
     }
 

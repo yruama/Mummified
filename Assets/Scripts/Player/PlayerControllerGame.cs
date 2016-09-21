@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerControllerGame : MonoBehaviour
 {
@@ -42,22 +43,49 @@ public class PlayerControllerGame : MonoBehaviour
     private Color _color;
     public TextMesh t;
     private Animator _anim;
+    public GameObject mummieSprite;
+
+    [Header("FeedBack")]
+    public GameObject hit;
+    public float timeInvicible;
+    private float _timeInvincible;
+    private bool _hit;
+    public float clignote;
+    private float _clignote;
+    private bool _white;
+
+    [HideInInspector]
+    public List<int> killer = new List<int>();
 
     void Start ()
     {
-        
+        _hit = false;
+        _white = false;
         controller = GetComponent<Controller2D>();
         gravity = -(2 * JumpHeight) / Mathf.Pow(forceFirstJump, 2);
         jumpVelocity = Mathf.Abs(gravity) * forceFirstJump;
         transform.position = spawnData.map1[playerId - 1];
 
-        _anim = GetComponent<Animator>();
+        _anim = mummieSprite.GetComponent<Animator>();
         _canAttack = true;
 
         _color = GetComponent<PlayerControllerMenu>().GetColor();
         arrow.GetComponent<SpriteRenderer>().color = _color;
-        GetComponent<SpriteRenderer>().color = _color;
+        mummieSprite.GetComponent<SpriteRenderer>().color = _color;
         GetComponent<PlayerControllerMenu>().enabled = false;
+    }
+
+    public void Reset()
+    {
+        if (GetComponent<PlayerControllerGame>().enabled == true)
+        {
+            _canAttack = true;
+            health = 100;
+            _hit = false;
+            _white = false;
+            transform.position = spawnData.map1[playerId - 1];
+        }
+
     }
 	
 	void Update ()
@@ -74,7 +102,18 @@ public class PlayerControllerGame : MonoBehaviour
 
         if (health <= 0)
             return;
-        
+
+        if (_hit == true)
+        {
+            if (Time.time - _timeInvincible > timeInvicible)
+            {
+                _hit = false;
+                mummieSprite.GetComponent<SpriteRenderer>().color = _color;
+            }
+            else        
+                Clignote();
+        }
+
         Vector2 input;
         if (Input.GetButton("Attack_" + playerId) && health > 15 && _canAttack)
         {
@@ -97,8 +136,7 @@ public class PlayerControllerGame : MonoBehaviour
     void FixedUpdate()
     {
        
-        if (health <= 0)
-            return;
+        
         Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal_" + playerId), Input.GetAxisRaw("Vertical_" + playerId));
         if (controller.collisions.above || controller.collisions.below)
         {
@@ -138,18 +176,41 @@ public class PlayerControllerGame : MonoBehaviour
         float targetVelocityX = input.x * speed;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
         velocity.y += gravity * Time.deltaTime;
+        if (health <= 0)
+        {
+            velocity = new Vector3(0, -9.81f, 0);
+        }
+
+        if ((input.x > 0) && _facing)
+            Flip();
+        else if ((input.x < 0) && !_facing)
+            Flip();
+
         controller.Move(velocity * Time.deltaTime, input);
     }
 
     public void SetHealth(int i, int id)
     {
+        if (_hit && id < 5)
+            return;
         health += i;
         health = (health > 100) ? 100 : health;
-      
+
+        if (id != playerId && id < 5)
+        {
+            _timeInvincible = Time.time;
+            _hit = true;
+            hit.GetComponent<Animator>().SetTrigger("hit");
+        }
 
         if (health <= 0)
         {
             health = 0;
+
+            if (id < 5)
+            {
+                killer.Add(id);
+            }
             gmg.CheckDeath();
         }
     }
@@ -196,9 +257,33 @@ public class PlayerControllerGame : MonoBehaviour
         // g.transform.eulerAngles = pos[posIndex].eulerAngles;
         g.GetComponent<Bandage>().p = gameObject;
         g.GetComponent<Bandage>().enabled = true;
+        g.GetComponent<Bandage>().playerId = playerId;
         g.GetComponent<Bandage>().direction = pos[posIndex].eulerAngles;
         g.GetComponent<Bandage>().Reset(0);
         
         SetHealth(-15, 9);
+    }
+
+    void Flip()
+    {
+        if (_flip == true)
+        {
+            _facing = !_facing;
+            mummieSprite.transform.localScale = new Vector3(mummieSprite.transform.localScale.x * -1, mummieSprite.transform.localScale.y, mummieSprite.transform.localScale.z);
+        }
+    }
+
+    void Clignote()
+    {
+        if (Time.time - _clignote > clignote)
+        {
+            if (_white)
+                mummieSprite.GetComponent<SpriteRenderer>().color = new Color(_color.r, _color.g, _color.b, 0.25f);
+            else
+                mummieSprite.GetComponent<SpriteRenderer>().color = _color;
+
+            _white = !_white;
+            _clignote = Time.time;
+        }
     }
 }
