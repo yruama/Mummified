@@ -47,7 +47,7 @@ public class PlayerControllerMenu : MonoBehaviour
             {
                 m.SetMenu(1);
             }
-                Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal_" + playerId), Input.GetAxisRaw("Vertical_" + playerId));
+            Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal_" + playerId), Input.GetAxisRaw("Vertical_" + playerId));
             if (input.x > 0 && Time.time - _timeColor > timeToChangeColor)
             {
                 _indexColor += 1;

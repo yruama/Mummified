@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using XInputDotNetPure;
 
 public class PlayerControllerGame : MonoBehaviour
 {
@@ -9,8 +10,9 @@ public class PlayerControllerGame : MonoBehaviour
     public float JumpHeight = 3;
     public float forceFirstJump = .4f;
     public float forceSecondJump = 0.3f;
+    public int numberJump = 2;
     bool _canDoubleJump;
-    bool _canJump;
+    bool _firstJump;
     float _timeJump;
     public float timeJump;
     float accelerationTimeAirborne = .2f;
@@ -18,6 +20,7 @@ public class PlayerControllerGame : MonoBehaviour
     float velocityXSmoothing;
     Vector3 velocity;
     float gravity = -20;
+    
 
     [Header("Movement")]
     public float speed = 5;
@@ -53,6 +56,15 @@ public class PlayerControllerGame : MonoBehaviour
     public float clignote;
     private float _clignote;
     private bool _white;
+
+    [Header("Vibration")]
+    public PlayerIndex playerIndex;
+    public float timeToVibrate;
+    public float vibrateForceHit;
+    public float vibrateForAttack;
+    private float _vibrateForce;
+    private float _timeVibrate;
+    private bool _vibrate;
 
     [HideInInspector]
     public List<int> killer = new List<int>();
@@ -114,33 +126,43 @@ public class PlayerControllerGame : MonoBehaviour
                 Clignote();
         }
 
-        Vector2 input;
+        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal_" + playerId), Input.GetAxisRaw("Vertical_" + playerId));
+
         if (Input.GetButton("Attack_" + playerId) && health > 15 && _canAttack)
         {
             _anim.SetBool("prepareAttack", true);
             _isAttacking = true;
-            input = new Vector2(Input.GetAxis("Horizontal_" + playerId), Input.GetAxis("Vertical_" + playerId));
+            if (input == Vector2.zero)
+            {
+                if (!_facing)
+                {
+                    input = Vector2.right;
+                }
+                else
+                {
+                    input = Vector2.left;
+                }
+            }
             SetArrowPosition((int)(Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg));
         }
 
-        if (Input.GetButtonUp("Attack_" + playerId) && health > 15 && _isAttacking == true)
+        if (Input.GetButtonUp("Attack_" + playerId) && health > 15)
         {
+            if (_isAttacking)
+            {
+                Attack();
+                ResetAttack();
+            }
             _anim.SetTrigger("ajustAttack");
             _anim.SetBool("prepareAttack", false);
-            Attack();
-            ResetAttack();
             _canAttack = true;
         }
-    }
 
-    void FixedUpdate()
-    {
        
-        
-        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal_" + playerId), Input.GetAxisRaw("Vertical_" + playerId));
         if (controller.collisions.above || controller.collisions.below)
         {
             velocity.y = 0;
+            _firstJump = false;
         }
 
         if (_isAttacking == true)
@@ -148,22 +170,28 @@ public class PlayerControllerGame : MonoBehaviour
             input.x = 0;
         }
 
+        /* *** TRY JUMP ***/
         if (Input.GetButtonDown("Jump_" + playerId))
         {
             if (controller.collisions.below)
-            {
+            { 
                 velocity.y = jumpVelocity;
-                _canDoubleJump = true;
                 _timeJump = Time.time;
+                _firstJump = true;
             }
             else if (Time.time - _timeJump > timeJump && _canDoubleJump)
             {
                 velocity.y = forceSecondJump;
                 _canDoubleJump = false;
-                _canJump = false;
+                _firstJump = false;
             }
         }
 
+        if (Input.GetButtonUp("Jump_" + playerId) && _firstJump == true)
+        {
+            _canDoubleJump = true;
+        }
+        /* *** END JUMP *** */
         if (Mathf.Abs(input.x) > 0)
         {
             _anim.SetBool("walk", true);
@@ -189,6 +217,21 @@ public class PlayerControllerGame : MonoBehaviour
         controller.Move(velocity * Time.deltaTime, input);
     }
 
+    void FixedUpdate()
+    {
+       if (Time.time - _timeVibrate > timeToVibrate)
+        {
+            _vibrate = false;
+            gmg.GetComponent<XInputTestCS>().SetVibration(playerIndex, 0.0f, 0.0f);
+        }
+
+        if (_vibrate)
+        {
+            gmg.GetComponent<XInputTestCS>().SetVibration(playerIndex, _vibrateForce, _vibrateForce);
+        }
+
+    }
+
     public void SetHealth(int i, int id)
     {
         if (_hit && id < 5)
@@ -201,6 +244,10 @@ public class PlayerControllerGame : MonoBehaviour
             _timeInvincible = Time.time;
             _hit = true;
             hit.GetComponent<Animator>().SetTrigger("hit");
+
+            _vibrateForce = vibrateForceHit;
+            _vibrate = true;
+            _timeVibrate = Time.time;
         }
 
         if (health <= 0)
@@ -233,8 +280,16 @@ public class PlayerControllerGame : MonoBehaviour
             posIndex = 6;
         else if (i > -158 && i <= -179 || i > 158 && i <= 180)
         {
-            ResetAttack();
-            return;
+            if (!controller.collisions.below)
+            {
+                posIndex = 7;
+            }
+            else
+            {
+                _canAttack = false;
+                ResetAttack();
+                return;
+            }
         }
 
         arrow.transform.position = pos[posIndex].position;
@@ -243,7 +298,7 @@ public class PlayerControllerGame : MonoBehaviour
 
     public void ResetAttack()
     {
-        _canAttack = true;
+       // _canAttack = true;
         _isAttacking = false;
         arrow.transform.position = new Vector3(100, 100, 100);
     }
@@ -260,8 +315,17 @@ public class PlayerControllerGame : MonoBehaviour
         g.GetComponent<Bandage>().playerId = playerId;
         g.GetComponent<Bandage>().direction = pos[posIndex].eulerAngles;
         g.GetComponent<Bandage>().Reset(0);
-        
+
+        _vibrateForce = vibrateForAttack;
+        _vibrate = true;
+        _timeVibrate = Time.time;
+
         SetHealth(-15, 9);
+    }
+
+    void LateUpdate()
+    {
+
     }
 
     void Flip()

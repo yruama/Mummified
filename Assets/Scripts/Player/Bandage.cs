@@ -11,7 +11,7 @@ public class Bandage : MonoBehaviour
     public float startForce;
     public float speed = 5;
     public float timeToUseGravity;
-
+    public float frottementdelair;
     private float _time;
     private bool _useGravity;
 
@@ -72,7 +72,11 @@ public class Bandage : MonoBehaviour
         {
             _velocity.x = Mathf.SmoothDamp(_velocity.x, _velocity.x, ref velocityXSmoothing, (_c.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
             if (Time.time - _time > timeToUseGravity && _useGravity)
-                _velocity.y += _gravity * Time.deltaTime;
+            {
+                _velocity.y -= (gravityForce * frottementdelair);
+                
+            }
+                
             
         }
         _c.Move(_velocity * Time.deltaTime, Vector3.zero);
@@ -90,6 +94,7 @@ public class Bandage : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D coll)
     {
+
         if (p != coll.gameObject)
         {
             if (coll.gameObject.tag == "Player" && _state == 0)

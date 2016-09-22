@@ -56,7 +56,7 @@ public class GameManagerMenu : MonoBehaviour
                 i += 1;
         }
 
-        if (i == _nbPlayer && _nbPlayer >= 2)
+        if (i == _nbPlayer/* && _nbPlayer >= 2*/)
         {
             Debug.Log("ON COMMENCE LA PARTIE");
             StartGame();
