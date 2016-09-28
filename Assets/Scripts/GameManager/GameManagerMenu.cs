@@ -9,6 +9,10 @@ public class GameManagerMenu : MonoBehaviour
     public string[] colorsName;
     public GameObject[] players;
     public GameObject menu;
+    public GameObject[] maps;
+    private int _indexMap;
+
+    public int mapIndex = 0;
 
     public GameObject Filtre;
 
@@ -22,6 +26,7 @@ public class GameManagerMenu : MonoBehaviour
 
 	void Start ()
     {
+
         _lastNbPlayer = -1;
         availableColors = new int[colors.Length];
 	}
@@ -34,6 +39,26 @@ public class GameManagerMenu : MonoBehaviour
             _lastNbPlayer = _nbPlayer;
             SetPlayer();
         }
+
+
+        if (Input.GetButtonDown("mapLeft"))
+        {
+            maps[mapIndex].SetActive(false);
+            mapIndex -= 1;
+            if (mapIndex < 0)
+                mapIndex = maps.Length -1;
+            maps[mapIndex].SetActive(true);
+        }
+        
+        if (Input.GetButtonDown("mapRight"))
+        {
+            Debug.Log(mapIndex);
+            maps[mapIndex].SetActive(false);
+            mapIndex += 1;
+            if (mapIndex > maps.Length -1)
+                mapIndex = 0;
+            maps[mapIndex].SetActive(true);
+        }
     }
 
     public void LockColor(int i)
@@ -42,7 +67,7 @@ public class GameManagerMenu : MonoBehaviour
 
         foreach (GameObject p in players)
         {
-            p.GetComponent<PlayerControllerMenu>().CheckColor();
+            p.GetComponent<PMenu>().CheckColor();
         }
     }
 
@@ -52,7 +77,7 @@ public class GameManagerMenu : MonoBehaviour
 
         foreach (GameObject p in players)
         {
-            if (p.GetComponent<PlayerControllerMenu>().GetValidate() == true)
+            if (p.GetComponent<PMenu>().GetValidate() == true)
                 i += 1;
         }
 
@@ -84,7 +109,7 @@ public class GameManagerMenu : MonoBehaviour
     {
         foreach (GameObject p in players)
         {
-            p.GetComponent<PlayerControllerMenu>().SetAvailaible(_nbPlayer);
+            p.GetComponent<PMenu>().SetAvailaible(_nbPlayer);
         }
     }
 
@@ -94,7 +119,7 @@ public class GameManagerMenu : MonoBehaviour
 
         while (i < _nbPlayer)
         {
-            players[i].GetComponent<PlayerControllerGame>().enabled = true;
+            players[i].GetComponent<PlayerManager>().SetAvaibleScript(2);
             GetComponent<GameManagerGame>().enabled = true;
             GetComponent<GameManagerGame>().nbPlayer = _nbPlayer;
             menu.SetActive(false);

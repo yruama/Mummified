@@ -8,6 +8,7 @@ public class Menu : MonoBehaviour
     public GameObject MenuGame;
     public GameObject MenuOptions;
     public GameObject MenuControl;
+    public GameObject MenuCredit;
     public float speedMenu;
 
     public GameObject eventSystem;
@@ -57,15 +58,17 @@ public class Menu : MonoBehaviour
                 break;
             case 2:
                 _newMenu = MenuGame;
-
                 break;
             case 3:
-                _newMenu =MenuOptions;
+                _newMenu = MenuOptions;
                 break;
             case 4:
                 _newMenu = MenuControl;
                 break;
             case 5:
+                _newMenu = MenuCredit;
+                break;
+            case 6:
                 Application.Quit();
                 break;
             default:
