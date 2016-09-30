@@ -40,7 +40,7 @@ public class GameManagerMenu : MonoBehaviour
             SetPlayer();
         }
 
-
+        /*
         if (Input.GetButtonDown("mapLeft"))
         {
             maps[mapIndex].SetActive(false);
@@ -58,7 +58,7 @@ public class GameManagerMenu : MonoBehaviour
             if (mapIndex > maps.Length -1)
                 mapIndex = 0;
             maps[mapIndex].SetActive(true);
-        }
+        }*/
     }
 
     public void LockColor(int i)
@@ -83,6 +83,8 @@ public class GameManagerMenu : MonoBehaviour
 
         if (i == _nbPlayer/* && _nbPlayer >= 2*/)
         {
+            // return;
+            GetComponent<AudioSource>().Play();
             Debug.Log("ON COMMENCE LA PARTIE");
             StartGame();
             Filtre.SetActive(false);

@@ -25,8 +25,11 @@ public class PJump : MonoBehaviour
 
     float gravity = -20;
 
+    public bool goDown;
+
     void Start()
     {
+        goDown = false;
         player = GetComponent<PlayerManager>();
         gravity = -(2 * JumpHeight) / Mathf.Pow(forceFirstJump, 2);
         jumpVelocity = Mathf.Abs(gravity) * forceFirstJump;
@@ -44,27 +47,31 @@ public class PJump : MonoBehaviour
             player.velocity.y = 0;
         }
 
-        if (Input.GetButtonDown("Jump_" + player.playerId))
+        if (!goDown)
         {
-            if (player.controller.collisions.below)
+            if (Input.GetButtonDown("Jump_" + player.playerId))
             {
-                player.GetComponent<AudioSource>().PlayOneShot(firstJumpSound);
-                player.velocity.y = jumpVelocity;
-                _firstJump = true;
+                if (player.controller.collisions.below)
+                {
+                    player.GetComponent<AudioSource>().PlayOneShot(firstJumpSound);
+                    player.velocity.y = jumpVelocity;
+                    _firstJump = true;
+                }
+                else if (_canDoubleJump)
+                {
+                    player.GetComponent<AudioSource>().PlayOneShot(secondJumpSound);
+                    player.velocity.y = forceSecondJump;
+                    _canDoubleJump = false;
+                    _firstJump = false;
+                }
             }
-            else if (_canDoubleJump)
-            {
-                player.GetComponent<AudioSource>().PlayOneShot(secondJumpSound);
-                player.velocity.y = forceSecondJump;
-                _canDoubleJump = false;
-                _firstJump = false;
-            }
-        }
 
-        if (Input.GetButtonUp("Jump_" + player.playerId) && _firstJump == true)
-        {
-            _canDoubleJump = true;
+            if (Input.GetButtonUp("Jump_" + player.playerId) && _firstJump == true)
+            {
+                _canDoubleJump = true;
+            }
         }
+        
 
         player.velocity.y += gravity * Time.deltaTime;
     }

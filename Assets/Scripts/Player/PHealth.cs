@@ -65,7 +65,7 @@ public class PHealth : MonoBehaviour
 
     public void SetHealth(int i, int id)
     {
-        if (_hit)
+        if (_hit || player.health <= 0)
             return;
 
         if (id != 0)
@@ -95,16 +95,19 @@ public class PHealth : MonoBehaviour
     {
         player.GetComponent<AudioSource>().PlayOneShot(dieSound);
         player.health = 0;
-        killer.Add(_id);
+        if (_id != 9)
+            killer.Add(_id);
         player.gmg.CheckDeath();
-        player.SetAvaibleScript(3);
+        // CHANGER ICI
+        transform.position = new Vector3(100, 100, 100);
+        //player.SetAvaibleScript(3);
     }
 
     void OnTriggerStay2D(Collider2D coll)
     {
         if (coll.tag == "eye")
         {
-            Debug.Log(name);
+            SetHealth(-50, 9);
         }
     }
 

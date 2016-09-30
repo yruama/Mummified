@@ -74,9 +74,14 @@ public class Controller2D : RaycastController
 
             if (hit)
             {
-
+                
                 if (hit.distance == 0)
                 {
+                   /* if (tag == "bandage")
+                    {
+                        collisions.left = true;
+                        collisions.right = true;
+                    }*/
                     continue;
                 }
 
@@ -126,36 +131,37 @@ public class Controller2D : RaycastController
         {
 
             Vector2 rayOrigin = (directionY == -1) ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
-            // Vector2 rayOrigin = raycastOrigins.bottomLeft;
             rayOrigin += Vector2.right * (verticalRaySpacing * i + velocity.x);
             RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
-            if (hit != false && hit.transform.tag == "Plateforme")
-            {
-                rayOrigin = raycastOrigins.bottomLeft;
-                rayOrigin += Vector2.right * (verticalRaySpacing * i + velocity.x);
-                 hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
-            }
             Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.red);
 
             if (hit)
             {
                 if (hit.collider.tag == "Through")
                 {
+                    
                     if (directionY == 1 || hit.distance == 0)
                     {
+                     
                         continue;
                     }
                     if (collisions.fallingThroughPlatform)
                     {
+        
                         continue;
                     }
-                    if (playerInput.y == -1)
+
+                    if (playerInput.y <= -0.75f && Input.GetButtonDown("Jump_" + GetComponent<PlayerManager>().playerId))
                     {
+                        GetComponent<PJump>().goDown = true;
                         collisions.fallingThroughPlatform = true;
                         Invoke("ResetFallingThroughPlatform", .5f);
                         continue;
                     }
+                    
                 }
+                if (tag == "Player")
+                    GetComponent<PJump>().goDown = false;
 
                 velocity.y = (hit.distance - skinWidth) * directionY;
                 rayLength = hit.distance;

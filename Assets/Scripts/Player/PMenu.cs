@@ -44,11 +44,19 @@ public class PMenu : MonoBehaviour
 
     void Update()
     {
+        /* *** Menu Back *** */
+        if (player.available && !_validate && Input.GetButtonDown("Attack_1"))
+        {
+            m.SetMenu(1);
+        }
+        /* *** Menu Back *** */
+
         /* *** Player DC *** */
         if (!player.available || m.currentMenu != 2)
             return;
         /* *** Player DC END *** */
 
+        
         /* *** Set Up Player *** */
         if (!_isOk)
         {

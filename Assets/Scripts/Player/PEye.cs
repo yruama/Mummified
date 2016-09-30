@@ -17,6 +17,8 @@ public class PEye : MonoBehaviour
     public float time;
     private bool _attack;
 
+    public int damage;
+
     public float firerate;
     private float nextfire = 0f;
 
@@ -27,6 +29,7 @@ public class PEye : MonoBehaviour
     {
         player = GetComponent<PlayerManager>();
 
+        
         _attack = false;
         _target = new Vector3(0, 0, angle.y);
         speedInitial = speed;
@@ -52,16 +55,15 @@ public class PEye : MonoBehaviour
 
         //TIR
 
-        if (Input.GetKeyDown(KeyCode.Space) && shoot == true)
+        if ((Input.GetButtonDown("Attack_" + player.playerId) || Input.GetButtonDown("Jump_" + player.playerId)) && shoot == true)
         {
-            
             speed = 0;
             Invoke("Shoot", castTime);
         }
 
         //RECHARGE
 
-        if (shoot == false && Time.time > nextfire)
+        if (shoot == false /*&& Time.time > nextfire*/)
         {
             shoot = true;
         }
@@ -81,6 +83,7 @@ public class PEye : MonoBehaviour
         _time = Time.time;
         _attack = true;
         arrow.transform.GetChild(0).gameObject.SetActive(true);
+        arrow.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().color = player.color;
         nextfire = Time.time + firerate;
         
         shoot = false;

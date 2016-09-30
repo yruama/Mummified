@@ -69,6 +69,7 @@ public class GameManagerGame : MonoBehaviour
 
         if (Time.time - _timeScore > timeToDisplayScore && _end == true && _endGame == false)
         {
+           
             Debug.Log("Afficher Score");
             _end = false;
             _timeBandage = Time.time;
@@ -136,6 +137,7 @@ public class GameManagerGame : MonoBehaviour
         {
             if (i[k] >= nbKill)
             {
+                GetComponent<AudioSource>().Stop();
                 Debug.Log("C'est FINIT");
                 _timeWinner = Time.time;
                 _endGame = true;
