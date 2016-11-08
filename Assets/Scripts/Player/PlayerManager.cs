@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class PlayerManager : MonoBehaviour
@@ -11,6 +12,14 @@ public class PlayerManager : MonoBehaviour
     public Controller2D controller;
     public PMenu pMenu;
     public PEye pEye;
+
+    [Header("Data")]
+    public int[] hitBandelette;
+    public int[] hitLaser;
+    public int throwBandeletteNb;
+    public int healBandeletteNb;
+    public GameObject Score;
+    public int score;
 
     [HideInInspector]
     public Animator anim;
@@ -26,6 +35,10 @@ public class PlayerManager : MonoBehaviour
     public int health;
     public Color color;
     public int statut = 1;
+
+    public int ScoreMalus = 0;
+
+    public bool _canJump;
 
     public bool available;
 
@@ -44,15 +57,57 @@ public class PlayerManager : MonoBehaviour
         lookAt = false;
         anim = pMovement.mummy.GetComponent<Animator>();
         SetAvaibleScript(1);
+        score = 0;
+
+        pMenu.enabled = true;
+        pMovement.enabled = false;
+        pHealth.enabled = false;
+        pJump.enabled = false;
+        pAttack.enabled = false;
+        pEye.enabled = false;
+
     }
 
     void Update()
     {
+        /* * SCORE * */
+        if (score < 0)
+            score = 0;
+        Score.transform.GetChild(0).GetComponent<Text>().text = score.ToString();
+        /* *** */
+
+
         input = new Vector2(Input.GetAxisRaw("Horizontal_" + playerId), Input.GetAxisRaw("Vertical_" + playerId));
+
+        if (gmm._isStart)
+        {
+            if (gmg._DecompteBool == true)
+            {
+                pAttack.ResetAll();
+                pAttack.enabled = false;
+                pMovement.enabled = false;
+            }
+            else
+            {
+                pAttack.enabled = true;
+                pMovement.enabled = true;
+            }
+        }
+        
+
+        Debug.Log(_canJump);
+
+        if (gmg._DecompteBool == true || gmg._end == true)
+        {
+            velocity.x = 0;
+            input.x = 0;
+        }
+
         if (health > 0)
         {
             if (isAttacking)
                 velocity.x = 0;
+            if (gmg.GetComponent<Pause>().pause == false)
             controller.Move(velocity * Time.deltaTime, input);
         }
     }
@@ -62,6 +117,7 @@ public class PlayerManager : MonoBehaviour
         statut = i;
         if (statut == 1)
         {
+            Score.SetActive(false);
             pMenu.enabled = true;
             pMovement.enabled = false;
             pHealth.enabled = false;
@@ -71,6 +127,10 @@ public class PlayerManager : MonoBehaviour
         }
         else if (statut == 2)
         {
+            /* SCORE */
+            Score.SetActive(true);
+            Score.GetComponent<Image>().color = color;
+            /* ** */
             pEye.enabled = false;
             pMenu.enabled = false;
             pMovement.enabled = true;
@@ -89,6 +149,7 @@ public class PlayerManager : MonoBehaviour
             pJump.enabled = false;
             pAttack.enabled = false;
             pEye.enabled = true;
+            pEye.SetPosition();
         }
         else
         {
@@ -101,9 +162,21 @@ public class PlayerManager : MonoBehaviour
         if (!available)
             return;
 
-        transform.localScale = new Vector3(2, 2, 0);
+        pHealth._die = false;
+        ScoreMalus = 0;
         pAttack.arrow.transform.SetParent(null);
+        pAttack.arrow.transform.localScale = new Vector3(7.5f, 7.5f, 0);
+        pAttack.arrow.transform.localScale = new Vector3(7.5f, 7.5f, 0);
         pAttack.arrow.transform.position = new Vector3(100, 100, 100);
+        pEye.spiritParticle.transform.position = Vector2.zero;
+        pEye.spiritParticle.SetActive(false);
+        pEye.ghostParticle.transform.position = Vector2.zero;
+        pEye.ghostParticle.SetActive(false);
+        pHealth.text.gameObject.SetActive(true);
+        pAttack.arrow.transform.GetChild(0).gameObject.SetActive(false);
+        pAttack.arrow.transform.GetChild(1).gameObject.SetActive(false);
+        pEye.charge.Stop();
+        pMovement.mummy.SetActive(true);
         SetAvaibleScript(2);
         
         transform.position = gmm.maps[gmm.mapIndex].GetComponent<SpawnPositionData>().player[playerId - 1];

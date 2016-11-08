@@ -28,6 +28,10 @@ public class Bandage : MonoBehaviour
 
     public Vector3 direction;
 
+    private float bugY;
+    private float lastBugY;
+    private bool _bug;
+
     [HideInInspector]
     public GameObject p;
 
@@ -45,6 +49,7 @@ public class Bandage : MonoBehaviour
         _time = Time.time;
         _gravity = -9.81f;
         _velocity = new Vector2(DegreeToVector2(direction.z).x, DegreeToVector2(direction.z).y) * startForce;
+        _bug = false;
     }
 
     void Start()
@@ -54,6 +59,23 @@ public class Bandage : MonoBehaviour
 
     void Update()
     {
+        /*** BUG ***/
+        bugY = transform.position.y;
+
+        
+
+        if (_velocity.y <= 0 && RoundValue(lastBugY, 100) < RoundValue(bugY, 100) && _state == 1 && _bug)
+        {
+
+            ResetFromBug();
+        }
+
+        if (lastBugY != bugY)
+        {
+            lastBugY = bugY;
+        }
+        /*** ENDBUG **/
+
         if (_c.collisions.below || _c.collisions.left || _c.collisions.right || _state == 1)
         {
             _velocity.y = -15f;
@@ -86,8 +108,12 @@ public class Bandage : MonoBehaviour
 
             }
 
+      /*      Debug.Log(_velocity + " " + transform.eulerAngles);
+            transform.eulerAngles = new Vector3(0, 0, Mathf.Atan2(_velocity.x, _velocity.y) * Mathf.Rad2Deg);*/
+            
 
         }
+        _bug = true;
         _c.Move(_velocity * Time.deltaTime, Vector3.zero);
     }
 
@@ -135,8 +161,22 @@ public class Bandage : MonoBehaviour
         }
     }
 
+    void ResetFromBug()
+    {
+        gmg.bandage.Add(gameObject);
+        transform.position = new Vector3(100, 100, 100);
+        GetComponent<SpriteRenderer>().sprite = s;
+        _state = 0;
+        GetComponent<Bandage>().enabled = false;
+    }
+
     public void ResetPosition()
     {
         transform.position = new Vector3(100, 100, 100);
+    }
+
+    public static float RoundValue(float num, float precision)
+    {
+        return Mathf.Floor(num * precision + 0.5f) / precision;
     }
 }

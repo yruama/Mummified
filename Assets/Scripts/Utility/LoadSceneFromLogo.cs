@@ -17,6 +17,7 @@ public class LoadSceneFromLogo : MonoBehaviour
 
 	void Start ()
     {
+        Cursor.visible = false;
         _image = logo.transform.GetChild(0).GetComponent<Image>().color;
         _text = logo.transform.GetChild(1).GetComponent<Text>().color;
         _finished = true;
@@ -47,6 +48,6 @@ public class LoadSceneFromLogo : MonoBehaviour
 
     void StartGame()
     {
-        SceneManager.LoadSceneAsync(1);
+        SceneManager.LoadScene(1);
     }
 }

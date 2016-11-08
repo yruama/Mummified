@@ -6,7 +6,6 @@ public class Menu : MonoBehaviour
 {
     public GameObject MenuGeneral;
     public GameObject MenuGame;
-    public GameObject MenuOptions;
     public GameObject MenuControl;
     public GameObject MenuCredit;
     public float speedMenu;
@@ -23,17 +22,22 @@ public class Menu : MonoBehaviour
     private GameObject _newMenu;
     private bool _changeMenu;
 
+    public AudioClip Sound;
+
 	void Start ()
     {
+        
         _currentMenu = MenuGeneral;
-        _newMenu = MenuGame;
+        _newMenu = MenuGeneral;
         _changeMenu = false;
 	}
 	
 	void Update ()
     {
+
         if (_changeMenu)
         {
+            
             _currentMenu.transform.position = Vector3.MoveTowards(_currentMenu.transform.position, endPos.position, speedMenu * Time.deltaTime);
             _newMenu.transform.position = Vector3.MoveTowards(_newMenu.transform.position, neutrePos.position, speedMenu * Time.deltaTime);
         }
@@ -51,6 +55,9 @@ public class Menu : MonoBehaviour
 
     public void SetMenu(int i)
     {
+        MenuGeneral.GetComponent<AudioSource>().volume = 1f;
+        MenuGeneral.GetComponent<AudioSource>().PlayOneShot(Sound);
+        MenuGeneral.GetComponent<AudioSource>().volume = 0.15f;
         switch (i)
         {
             case 1:
@@ -58,9 +65,6 @@ public class Menu : MonoBehaviour
                 break;
             case 2:
                 _newMenu = MenuGame;
-                break;
-            case 3:
-                _newMenu = MenuOptions;
                 break;
             case 4:
                 _newMenu = MenuControl;

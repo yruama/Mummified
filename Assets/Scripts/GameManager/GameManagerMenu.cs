@@ -12,21 +12,35 @@ public class GameManagerMenu : MonoBehaviour
     public GameObject[] maps;
     private int _indexMap;
 
+    public Menu m;
     public int mapIndex = 0;
+
+    public bool _isStart;
 
     public GameObject Filtre;
 
     private int _nbPlayer;
     private int _lastNbPlayer;
 
+    public Text Round;
+    public int roundIndex;
+    public int[] rounds;
+    public int nbRound;
 
+    public AudioClip[] clip;
 
     [HideInInspector]
     public int[] availableColors;
 
 	void Start ()
     {
-
+        _isStart = false;
+       
+        GetComponent<AudioSource>().PlayOneShot(clip[0]);
+        
+        roundIndex = 0;
+        nbRound = rounds[roundIndex];
+        //Cursor.visible = false;
         _lastNbPlayer = -1;
         availableColors = new int[colors.Length];
 	}
@@ -34,31 +48,38 @@ public class GameManagerMenu : MonoBehaviour
 	void Update ()
     {
         GetNumberOfJoysticks();
-        if (_nbPlayer != _lastNbPlayer)
+        if (_nbPlayer != _lastNbPlayer && m.currentMenu != 1)
         {
             _lastNbPlayer = _nbPlayer;
             SetPlayer();
         }
 
-        /*
-        if (Input.GetButtonDown("mapLeft"))
-        {
-            maps[mapIndex].SetActive(false);
-            mapIndex -= 1;
-            if (mapIndex < 0)
-                mapIndex = maps.Length -1;
-            maps[mapIndex].SetActive(true);
-        }
-        
+        Round.text = rounds[roundIndex].ToString();
+        nbRound = rounds[roundIndex];
+
         if (Input.GetButtonDown("mapRight"))
         {
-            Debug.Log(mapIndex);
-            maps[mapIndex].SetActive(false);
-            mapIndex += 1;
-            if (mapIndex > maps.Length -1)
-                mapIndex = 0;
-            maps[mapIndex].SetActive(true);
-        }*/
+            GetComponent<AudioSource>().PlayOneShot(clip[2]);
+            roundIndex += 1;
+
+            if (roundIndex > rounds.Length - 1)
+            {
+                roundIndex = 0;
+            }
+        }
+        
+        if (Input.GetButtonDown("mapLeft"))
+        {
+            GetComponent<AudioSource>().PlayOneShot(clip[2]);
+            
+            roundIndex -= 1;
+
+            if (roundIndex < 0)
+            {
+               roundIndex = rounds.Length - 1;
+                
+            }
+        }
     }
 
     public void LockColor(int i)
@@ -84,7 +105,9 @@ public class GameManagerMenu : MonoBehaviour
         if (i == _nbPlayer/* && _nbPlayer >= 2*/)
         {
             // return;
-            GetComponent<AudioSource>().Play();
+            GetComponent<AudioSource>().Stop();
+            GetComponent<AudioSource>().PlayOneShot(clip[1]);
+            GetComponent<AudioSource>().pitch = 0.9f;
             Debug.Log("ON COMMENCE LA PARTIE");
             StartGame();
             Filtre.SetActive(false);
@@ -117,6 +140,7 @@ public class GameManagerMenu : MonoBehaviour
 
     void StartGame()
     {
+        _isStart = true;
         int i = 0;
 
         while (i < _nbPlayer)

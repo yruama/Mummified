@@ -51,13 +51,13 @@ public class PJump : MonoBehaviour
         {
             if (Input.GetButtonDown("Jump_" + player.playerId))
             {
-                if (player.controller.collisions.below)
+                if (player.controller.collisions.below && player.gmg._DecompteBool == false)
                 {
                     player.GetComponent<AudioSource>().PlayOneShot(firstJumpSound);
                     player.velocity.y = jumpVelocity;
                     _firstJump = true;
                 }
-                else if (_canDoubleJump)
+                else if (_canDoubleJump && player.gmg._DecompteBool == false)
                 {
                     player.GetComponent<AudioSource>().PlayOneShot(secondJumpSound);
                     player.velocity.y = forceSecondJump;

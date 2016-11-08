@@ -28,25 +28,43 @@ public class PMenu : MonoBehaviour
     private Color _saveColor;
     private bool _isOk;
     private bool _tresSale;
+    private bool _action;
+
+    public AudioClip Sound;
+    public AudioClip ValidateSound;
 
     public Menu m;
 
     void Start()
     {
+
         player = GetComponent<PlayerManager>();
+        Debug.Log("No Player");
 
         _validate = false;
         _tresSale = false;
         _isOk = false;
         _timeColor = Time.time;
         _indexColor = 0;
+
+        if (player.playerId == 1)
+            _isOk = true;
     }
 
     void Update()
     {
-        /* *** Menu Back *** */
-        if (player.available && !_validate && Input.GetButtonDown("Attack_1"))
+      /*  while (player == null)
         {
+            Debug.Log("coucou");
+            player = GetComponent<PlayerManager>();
+        }*/
+           
+
+        /* *** Menu Back *** */
+        if (player.available && !_validate && Input.GetButtonDown("Attack_1") && m.currentMenu != 1)
+        {
+            if (m.currentMenu == 2 && _action == false)
+                return;
             m.SetMenu(1);
         }
         /* *** Menu Back *** */
@@ -75,6 +93,7 @@ public class PMenu : MonoBehaviour
         {
             if (player.input.x > 0 && Time.time - _timeColor > timeToChangeColor)
             {
+                GetComponent<AudioSource>().PlayOneShot(Sound);
                 _indexColor += 1;
                 _timeColor = Time.time;
                 if (_indexColor > player.gmm.colors.Length - 1)
@@ -84,6 +103,7 @@ public class PMenu : MonoBehaviour
             }
             else if (player.input.x < 0 && Time.time - _timeColor > timeToChangeColor)
             {
+                GetComponent<AudioSource>().PlayOneShot(Sound);
                 _indexColor -= 1;
                 _timeColor = Time.time;
                 if (_indexColor < 0)
@@ -101,6 +121,7 @@ public class PMenu : MonoBehaviour
 
             if (Input.GetButtonDown("Jump_" + player.playerId) && _tresSale == false)
             {
+                GetComponent<AudioSource>().PlayOneShot(ValidateSound);
                 cadre.GetComponent<Image>().sprite = player.gmm.cadre[_indexColor];
                 _validate = true;
                 _saveColor = player.gmm.colors[_indexColor];
@@ -120,11 +141,17 @@ public class PMenu : MonoBehaviour
         {
             if (Input.GetButtonDown("Attack_" + player.playerId))
             {
+                _action = false;
                 _validate = false;
                 player.gmm.availableColors[_indexColor] = 0;
                 t.text = player.gmm.colorsName[_indexColor];
                 cadre.GetComponent<Image>().sprite = Disable;
             }
+        }
+
+        if (Input.GetButtonUp("Attack_" + player.playerId))
+        {
+            _action = true;
         }
     }
 
@@ -150,6 +177,8 @@ public class PMenu : MonoBehaviour
 
     public void SetAvailaible(int i)
     {
+        if (player == null)
+            return;
         if (player.playerId > i)
         {
             player.available = false;

@@ -22,7 +22,7 @@ public class PAttack : MonoBehaviour
 
 	void Update ()
     {
-        Debug.Log(player.lookAt);
+
         if (Input.GetButton("Attack_" + player.playerId) && player.health > 15 && _canAttack)
         {
             player.anim.SetBool("prepareAttack", true);
@@ -51,6 +51,20 @@ public class PAttack : MonoBehaviour
             _canAttack = true;
         }
 
+        if (player.isAttacking == true && player.health <= 15)
+        {
+            ResetAttack();
+            player.isAttacking = false;
+        }
+
+    }
+
+    public void ResetAll()
+    {
+        player.anim.SetTrigger("ajustAttack");
+        player.anim.SetBool("prepareAttack", false);
+        player.isAttacking = false;
+        arrow.transform.position = new Vector3(100, 100, 100);
     }
 
     public void SetArrowPosition(int i)

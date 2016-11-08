@@ -151,7 +151,7 @@ public class Controller2D : RaycastController
                         continue;
                     }
 
-                    if (playerInput.y <= -0.75f && Input.GetButtonDown("Jump_" + GetComponent<PlayerManager>().playerId))
+                    if (playerInput.y <= -0.75f && Input.GetButtonDown("Jump_" + GetComponent<PlayerManager>().playerId) && GetComponent<PlayerManager>().gmg._DecompteBool == false)
                     {
                         GetComponent<PJump>().goDown = true;
                         collisions.fallingThroughPlatform = true;

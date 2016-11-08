@@ -102,13 +102,16 @@ public class PlatformController : RaycastController
     {
         foreach (PassengerMovement passenger in passengerMovement)
         {
+            
             if (!passengerDictionary.ContainsKey(passenger.transform))
             {
+                
                 passengerDictionary.Add(passenger.transform, passenger.transform.GetComponent<Controller2D>());
             }
 
             if (passenger.moveBeforePlatform == beforeMovePlatform)
             {
+                
                 passengerDictionary[passenger.transform].Move(passenger.velocity, passenger.standingOnPlatform);
             }
         }
